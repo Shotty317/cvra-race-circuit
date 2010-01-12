@@ -1,0 +1,240 @@
+<TMPL_INCLUDE header.tmpl>
+    <style type="text/css">
+    .zipcode {
+      display: none;
+    }
+    </style>
+    <script type="text/javascript">
+      function fieldEmpty(value1, alertText)
+      {
+        if (value1==null || value1=="")
+        {
+          if (alertText != null && alertText != "")
+          {
+            alert(alertText);
+          }
+          return true;
+        }
+        return false;
+      }
+        
+      function validateForm(form)
+      {
+        if (form.returningUser[1].checked) // returning user
+        {
+          // Make sure a person is selected from the list for a returning user
+          if (fieldEmpty(form.returningUserList.value, "Please select a name from the list for a returning user"))
+          {
+            return false;
+          }
+        }
+        else if (form.returningUser[0].checked) // new user
+        {
+          var invalidString = "";
+          
+          // make sure all the fields are filled out for a new user
+          if (fieldEmpty(form.firstName.value, ""))
+          {
+            invalidString += "  -First Name\n";
+          }
+          if (fieldEmpty(form.lastName.value, ""))
+          {
+            invalidString += "  -Last Name\n";
+          }
+          if (!form.gender[0].checked && !form.gender[1].checked)
+          {
+            invalidString += "  -Gender\n";
+          }
+          if (form.ageGroup.value == "--")
+          {
+            invalidString += "  -Age Group\n";
+          }
+
+          if (invalidString != "")
+          {
+            alert("Please fill in the following fields for a new person:\n" + invalidString);
+            return false;
+          }
+        }
+        else
+        {
+          alert("Select either New User or Returning User");
+          return false;
+        }
+
+        if (fieldEmpty(form.raceList.value, "Please select the race in which you participated from the list of races"))
+        {
+          return false;
+        }
+        
+        if (!form.activityType[0].checked && !form.activityType[1].checked)
+        {
+          alert("Please select your activity at the race");
+          return false;
+        }
+        return true;
+      }
+      
+      function enableUserType(firstTimeUser)
+      {
+        var index = firstTimeUser ? 0 : 1;
+        document.circuitInfo.returningUser[index].checked = true;
+
+        // First time user
+        document.circuitInfo.firstName.disabled = !firstTimeUser;
+        document.circuitInfo.lastName.disabled = !firstTimeUser;
+        document.circuitInfo.gender[0].disabled = !firstTimeUser;
+        document.circuitInfo.gender[1].disabled = !firstTimeUser;
+        document.circuitInfo.ageGroup.disabled = !firstTimeUser;
+        
+        var enabledColor = "#000000";
+        var disabledColor = "#C0C0C0";
+        var firstColor = firstTimeUser ? enabledColor : disabledColor;
+        var returnColor = firstTimeUser ? disabledColor : enabledColor;
+        document.getElementById("firstNameLabel").style.color = firstColor;
+        document.getElementById("lastNameLabel").style.color = firstColor;
+        document.getElementById("genderLabel").style.color = firstColor;
+        document.getElementById("ageGroupLabel").style.color = firstColor;
+        document.getElementById("maleLabel").style.color = firstColor;
+        document.getElementById("femaleLabel").style.color = firstColor;
+
+        // returning user
+        document.circuitInfo.returningUserList.disabled = firstTimeUser;
+      }
+
+      <TMPL_IF returningUser>
+      function configureReturningUser()
+      {
+        enableUserType(false);
+      }
+
+      window.onload = configureReturningUser;
+      </TMPL_IF>
+    </script>
+
+    <TMPL_IF noCircuit>
+      <p>There is currently no Circut compeition ongoing, so you cannot submit any race information. Check back soon for when a new Circuit will occur.</p>      
+    <TMPL_ELSE>
+
+    <TMPL_IF error>
+    <br>
+    <center>
+      <div style="background-color: red; text-color: white; border: medium double black; width: 75%; padding: 5px;">
+      The following information is incorrect or missing from when you submitted your race information. Please correct it and try again. If you are unable to resolve this error, please contact <a href="http://cvra.net/contact-us/34-board/12-joey-richey">CVRA Race Circuit Support</a> for help.
+      <blockquote>
+      <ul style="text-align: left;">
+      <TMPL_LOOP error>
+        <li><TMPL_VAR str></li>
+      </TMPL_LOOP>
+      </ul>
+      </blockquote>
+      </div>
+    </center>
+    </TMPL_IF>
+
+    <form name="circuitInfo" action="submit.pl" onsubmit="return validateForm(this);" method="POST">
+      <fieldset>
+        <legend>Name</legend>
+        <p>If this is the first race you are submitting for the year, please select 'First Time User' and enter your information on the left before selecting the race in which you participated. If you have previously submitted a race, please select 'Returning User' on the right and select your name from the list. In the event that you submit incorrect information for a race and need it changed, pleaes contact <a href="http://cvra.net/contact-us/34-board/12-joey-richey">CVRA Race Circuit Support</a> with the details of what needs to be modified.</p>
+        <center>
+        <TMPL_IF returningUser>
+              <div style="background-color: yellow; border: medium double black; padding: 5px;">
+          <b>Note:</b> It appears that you have submitted a race already this year. Most likely you will want to select your name from the list on the <b>right</b>.
+        </div>
+        </TMPL_IF>
+        <TMPL_IF firstTimeUser>
+          <div style="background-color: yellow; border: medium double black; padding: 5px;">
+            <b>Note:</b> It appears that this will be your first race entry of the year. Most likely you will want to enter your name and information on the <b>left</b>.
+          </div>
+        </TMPL_IF>
+        </center>
+        <br>
+
+        <input type="checkbox" name="rememberMe" id="rememberMe" value="true"<TMPL_IF rememberMe> checked="checked"</TMPL_IF>>
+        <label for="rememberMe" id="rememberMeLabel">Remember me on this computer</label>
+        <br>
+
+        <table border="1" cellspacing="2" cellpadding="2" width="100%">
+          <tr valign="top">
+            <td width="50%">
+              <input type="radio" name="returningUser" value="false" id="firstTimeUser" onClick="enableUserType(true);"<TMPL_IF firstTimeUserChecked> checked="checked"</TMPL_IF>>
+              <label for="firstTimeUser" title="Please select this option if this race if the first one you are submitting for the current year">First Time User</label>
+              
+              <hr>
+              <table border="0" cellspacing="2" cellpadding="2">
+                <tr>
+                  <td><label for="firstName" id="firstNameLabel">First Name:</label></td>
+                  <td><input type="text" name="firstName" id="firstName" onClick="enableUserType(true);"<TMPL_IF firstNameValue> value="<TMPL_VAR firstNameValue>"</TMPL_IF>></td>
+                </tr>
+                <tr>
+                  <td><label for="lastName" id="lastNameLabel">Last Name:</label></td>
+                  <td><input type="text" name="lastName" id="lastName" onClick="enableUserType(true);"<TMPL_IF lastNameValue> value="<TMPL_VAR lastNameValue>"</TMPL_IF>></td>
+                </tr>
+                <tr>
+                  <td><label id="genderLabel">Gender:</label></td>
+                  <td>
+                    <input type="radio" name="gender" value="male" onClick="enableUserType(true);" id="radioMale"<TMPL_IF maleChecked> checked="checked"</TMPL_IF>>
+                    <label id="maleLabel" for="radioMale">Male</label>
+
+                    <input type="radio" name="gender" value="female" id="radioFemale" onClick="enableUserType(true);"<TMPL_IF femaleChecked>checked="checked"</TMPL_IF>>
+                    <label id="femaleLabel" for="radioFemale">Female</label>
+                  </td>
+                </tr>
+                <tr>
+                  <td valign="top"><label for="ageGroup" id="ageGroupLabel">Age Group:</label></td>
+                  <td>
+                    <select name="ageGroup" id="ageGroup" onClick="enableUserType(true);">
+                      <option>--</option>
+                      <TMPL_LOOP ageGroups>
+                      <option value="<TMPL_VAR id>"<TMPL_IF selected> selected="selected"</TMPL_IF>><TMPL_VAR text></option>
+                      </TMPL_LOOP>
+                    </select>
+                    <br>
+                    (Use your age on December 31<sup>st</sup> of the current year to determine your age group)
+                  </td>
+                </tr>
+              </table>
+            </td>
+            <td width="50%">
+              <input type="radio" name="returningUser" value="true" id="returningUser" onClick="enableUserType(false);" <TMPL_IF returningUserChecked>checked="checked"</TMPL_IF>>
+              <label for="returningUser" title="Please select this option if you have already submitted at least one race for the current year">Returning User</label>
+              <hr>
+              <select name="returningUserList" size="10" onClick="enableUserType(false);">
+              <TMPL_LOOP users>
+                <option value="<TMPL_VAR id>"<TMPL_IF selected> selected="selected"</TMPL_IF>><TMPL_VAR name> (<TMPL_VAR ageGroup>)</option>
+              </TMPL_LOOP>
+              </select>
+            </td>
+          </tr>
+        </table>
+      </fieldset>
+      <fieldset>
+        <legend>Race Information</legend>
+        <p>Please provide the information about the race in which your participated.</p>
+        <label for="raceList" id="raceListLabel">Select the race:</label>
+        <br>
+        <select name="raceList" id="raceList" size="15" style="min-width:100px;">
+        <TMPL_LOOP races>
+          <option value="<TMPL_VAR id>"<TMPL_IF selected> selected="selected"</TMPL_IF>><TMPL_VAR name><TMPL_IF date> (<TMPL_VAR date>)</TMPL_IF> - <TMPL_VAR distance><TMPL_IF cvra> *</TMPL_IF></option>
+        </TMPL_LOOP>
+        </select>
+        <p>* CVRA event</p>
+        <table border="0" cellspacing="2" cellpadding="2">
+          <tr>
+            <td valign="top">Activity:</td>
+            <td>
+              <input type="radio" name="activityType" id="activityRace" value="race"<TMPL_IF activityRaceChecked> checked="checked"</TMPL_IF>><label for="activityRace">Ran or Walked</label><br>
+              <input type="radio" name="activityType" id="activityVolunteer" value="volunteer"<TMPL_IF activityVolunteerChecked> checked="checked"</TMPL_IF>><label for="activityVolunteer">Volunteered</label>
+            </td>
+          </tr>
+        </table>
+      </fieldset>
+      <br>
+      <div class="zipcode">
+        <p>If you can see this box (which you shoudln't be able to), please leave it blank or else your race will not be counted.</p>
+        <input name="zipcode" size="20" type="text">
+      </div>
+      <input type="submit" name="submit" value="Submit Race Information">
+    </form>
+    </TMPL_IF> <!-- noCircuit -->
+<TMPL_INCLUDE footer.tmpl>

@@ -1,0 +1,108 @@
+<TMPL_INCLUDE header.tmpl>
+
+<style type="text/css">
+span.age-group-header {
+  font-size: 150%;
+  font-weight: bold;
+  text-align: right;
+}
+
+td.age-group-header {
+  border-bottom: 1px solid rgb(204, 204, 204); 
+  padding-bottom: 2px;
+}
+
+table.results td.right-border {
+  border-right: 2px solid #000000;
+}
+
+table.results tr.o {
+  background-color: #E9E9E9;
+}
+
+table.results th.bottom-border {
+ border-bottom: 2px solid #000000;
+}
+
+.results {
+}
+
+.submitted {
+  background-color: green;
+  color: white;
+  border: medium double white;
+  width: 75%;
+  padding: 5px;
+}
+
+</style>
+
+<TMPL_IF submitted>
+<br>
+<center>
+  <div class="submitted">Congratulations, your race information was successfully recorded. The standings below reflect this latest race. <a href="racelist.pl">Keep on racing</a> to collect more points. For any errors or corrections, please contact <a href="http://cvra.net/contact-us/34-board/12-joey-richey">CVRA Race Circuit Support</a>.</div>
+</center>
+</TMPL_IF>
+
+<p>Below are the <TMPL_IF active>current<TMPL_ELSE><b>final</b></TMPL_IF> CVRA Race Circuit standings for <TMPL_VAR year>. You can view <a href="standings.pl?mode=browse">other years</a>. If you have any questions, problems, or corrections involving the results, please contact <a href="http://cvra.net/contact-us/34-board/12-joey-richey">CVRA Race Circuit Support</a>. Note: Only age groups for which results have been received are shown.</p>
+
+<center>
+<TMPL_IF ageGroups>
+Age Groups:
+<TMPL_LOOP ageGroups>
+  <a href="#ag<TMPL_VAR ageGroup>"><TMPL_VAR ageGroup></a><TMPL_UNLESS __last__> |</TMPL_UNLESS>
+</TMPL_LOOP>
+</center>
+
+<table border="0" width="75%" align="center">
+<TMPL_LOOP ageGroups>
+  <tr>
+    <td class="age-group-header" height="40" nowrap="nowrap" valign="bottom" colspan="2">
+      <span id="ag<TMPL_VAR ageGroup>" class="age-group-header"><TMPL_VAR ageGroup></span>
+    </td>
+  </tr>
+  <tr valign="top" align="center">
+    <TMPL_LOOP genders>
+    <td width="50%">
+      <table class="results" cellpadding="3" cellspacing="0" border="1">
+	<caption><b><TMPL_VAR gender></b></caption>
+        <thead>
+          <tr>
+            <th class="bottom-border" rowspan="2">&nbsp;</th>
+            <th class="bottom-border" rowspan="2">Name</th>
+            <th colspan="3">Points</th>
+          </tr>
+          <tr>
+            <th class="bottom-border">Race</th>
+            <th class="bottom-border">Volunteer</th>
+            <th class="bottom-border">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+	  <TMPL_IF empty>
+	  <tr>
+            <td colspan="5">No results yet for this category.<br> Some people need to get racing!</td>
+	  </tr>
+	  <TMPL_ELSE>
+          <TMPL_LOOP people>
+          <tr<TMPL_IF __odd__> class="o"</TMPL_IF>>
+            <td><TMPL_VAR __counter__></td>
+            <td><a href="personDetails.pl?person=<TMPL_VAR personId>"><TMPL_VAR name></a></td>
+            <td align="right"><TMPL_VAR racePoints></td>
+            <td align="right" class="right-border"><TMPL_VAR volunteerPoints></td>
+            <td align="right"><b><TMPL_VAR totalPoints></b></td>
+          </tr>
+          </TMPL_LOOP>
+	  </TMPL_IF>
+        </tbody>
+      </table>
+    </td>
+    </TMPL_LOOP>
+  </tr>
+</TMPL_LOOP>
+</table>
+<TMPL_ELSE>
+<p>No results yet for this year!</p>
+</TMPL_IF>
+
+<TMPL_INCLUDE footer.tmpl>

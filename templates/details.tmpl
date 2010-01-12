@@ -1,0 +1,12 @@
+<TMPL_INCLUDE header.tmpl>
+
+<TMPL_IF name>
+<h2><TMPL_VAR name></h2>
+<p>Below is a list of races from which <TMPL_VAR name> earned points in <TMPL_VAR year>. <a href="standings.pl?circuit=<TMPL_VAR circuitId>#ag<TMPL_VAR ageGroup>">See where this person stands in their age group</a>.</p>
+
+<TMPL_INCLUDE raceTable.tmpl>
+
+<TMPL_ELSE>
+<p>Person not found!</p>
+</TMPL_IF>
+<TMPL_INCLUDE footer.tmpl>
