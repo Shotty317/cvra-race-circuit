@@ -1,0 +1,9 @@
+<TMPL_INCLUDE header.tmpl>
+<p>Please select from which year you would like to see CVRA Circuit results.</p>
+<blockquote>
+<TMPL_LOOP years>
+<a href="standings.pl?circuit=<TMPL_VAR id>"><TMPL_VAR year></a><TMPL_IF active> (Currently in progress)</TMPL_IF><br />
+</TMPL_LOOP>
+</blockquote>
+
+<TMPL_INCLUDE footer.tmpl>

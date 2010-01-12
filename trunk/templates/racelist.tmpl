@@ -1,0 +1,15 @@
+<TMPL_INCLUDE header.tmpl>
+
+<p>Below is a list of eligible races and their corresponding point values for <TMPL_VAR year>. Run or volunteer at each race to earn points towards the CVRA Circuit. <span style="font-weight:bold; background-color: yellow;">Bold, yellow</span> races are CVRA events (worth double points).</p>
+
+<TMPL_IF noCircuit>
+<hr />
+<p>There is currently no Circut compeition ongoing, so you cannot submit any race information. Check back soon for when a new Circuit will occur.</p>      
+<hr />
+<TMPL_ELSE>
+<TMPL_INCLUDE raceTable.tmpl>
+</TMPL_IF>
+
+<p><b>Note:</b> The list of the races included in the CVRA Race Circuit for the current year is already set and will not be added to. If you are a race director and want your event to be considered for possible inclusion in future years, please <a href="http://cvra.net/contact-us">contact CVRA</a> with your request.</p>
+
+<TMPL_INCLUDE footer.tmpl>
