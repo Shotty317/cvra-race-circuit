@@ -27,25 +27,8 @@ require 'consts.pl';
 require 'error.pl';
 
 eval {
-  #connect to the database
-  my $dbh = DBI->connect(@consts::DB_OPT);
-    
   #create our html template
   my $template = HTML::Template->new(filename  => 'rules.tmpl', @consts::TMPL_OPT);
-
-  my $sth = $dbh->prepare("SELECT text FROM age_group ORDER by text");
-  
-  $sth->execute();
-  
-  my @ageGroups;
-  while(my @data = $sth->fetchrow_array()) {
-    push (@ageGroups, {ageGroup => shift @data});
-  }
-  $sth->finish;
-  
-  $dbh->disconnect();
-  
-  $template->param(ageGroups => \@ageGroups);
   
   print header(-"Cache-Control"=>"no-cache",
                -expires =>  '+0s');

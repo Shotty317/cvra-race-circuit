@@ -40,7 +40,6 @@ eval {
     #connect to the database
     my $dbh = DBI->connect(@consts::DB_OPT);
     
-    
     my $sth = $dbh->prepare("SELECT name, circuit.id, age_group.text, year FROM people INNER JOIN(circuit) ON (people.circuit_id = circuit.id) INNER JOIN(age_group) ON people.age_group = age_group.id WHERE people.id=?");
     
     $sth->execute($personId);
@@ -53,47 +52,43 @@ eval {
     }
     $sth->finish();
     
-    my %races;
-
-    # Volunteer Points
-
+    my @events;
     # Don't need to limit by circuit id, becuase a person Id is implicitly tied to a circuit ID
-    $sth = $dbh->prepare("SELECT races.id, races.name, races.date, races.order, distance, volunteer_points FROM results INNER JOIN(races) ON results.race_id = races.id WHERE person_id = ? AND results.type='volunteer'");
+    $sth = $dbh->prepare("SELECT races.name, events.name, date_year, date_month, date_day, distance, volunteer_points, run_points, results.type FROM results INNER JOIN(races) ON results.race_id = races.id INNER JOIN(events) ON races.event_id = events.id WHERE person_id = ? ORDER BY date_year, date_month, date_day, events.id");
     $sth->execute($personId);
     while(my @data = $sth->fetchrow_array()) {
-      my $raceId = shift @data;
-      $races{$raceId} = {name => shift @data,
-                         date => shift @data,
-                         order => shift @data,
-                         distance => shift @data,
-                         volunteerPoints => shift @data};
-    }
-    $sth->finish;
-    
-    # Race Points
-    $sth = $dbh->prepare("SELECT races.id, races.name, races.date, races.order, distance, run_points FROM results INNER JOIN(races) ON results.race_id = races.id WHERE person_id = ? AND results.type='race'");
-    $sth->execute($personId);
-    while(my @data = $sth->fetchrow_array()) {
-      my $raceId = shift @data;
-      $races{$raceId}{name} = shift @data;
-      $races{$raceId}{date} = shift @data;
-      $races{$raceId}{order} = shift @data;
-      $races{$raceId}{distance} = shift @data;
-      $races{$raceId}{racePoints} = shift @data;
+      my @event;
+      my %race = (raceName => shift @data,
+                  eventName => shift @data,
+                  date => &error::makeDate(shift @data, shift @data, shift @data),
+                  distance => shift @data);
+      my $volunteerPoints = shift @data;
+      my $runPoints = shift @data;
+      my $pointType = shift @data;
+      if ($pointType eq 'volunteer') {
+        $race{volunteerPoints} = $volunteerPoints;
+      }
+      elsif ($pointType eq 'race')
+      {
+        $race{racePoints} = $runPoints;
+      }
+      else
+      {
+        die "Invalid pointType $pointType";
+      }
+
+      push (@event, \%race);
+      push(@events, { event => \@event,
+                      size => scalar @event,
+                      eventName => $race{'eventName'},
+                      url => $race{'url'},
+                      date => $race{'date'},
+                      cvra => $race{'cvra'}});
     }
     $sth->finish;
     $dbh->disconnect();
 
-    my @results;
-
-    while ( (my $raceId, my $race) = each(%races))
-    {
-      push(@results, \%$race);
-    }
-
-    @results = sort {$a->{order} <=> $b->{order}} (@results);
-
-    $template->param(races => \@results);
+    $template->param(events => \@events);
   }
   
   print header(-"Cache-Control"=>"no-cache",
