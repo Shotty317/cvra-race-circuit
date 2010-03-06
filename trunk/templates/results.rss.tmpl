@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+  <channel>
+    <title>CVRA Race Circuit</title>
+    <atom:link href="http://points.joesdiner.org/rss.pl" rel="self" type="application/rss+xml"/>
+    <link>http://points.joesdiner.org/</link>
+    <description>An RSS feed of the latest race submitals to the CVRA Circuit System</description>
+    <language>en-us</language>
+    <webMaster>joey@dogsplayingpoker.org (Joey)</webMaster>
+    <copyright>Copyright Cedar Valley Running Association. All Rights Reserved.</copyright>
+    <docs>http://blogs.law.harvard.edu/tech/rss</docs>
+    <lastBuildDate><TMPL_VAR lastBuildDate></lastBuildDate>
+    <generator>CVRA Race Circuit (http://code.google.com/p/cvra-race-circuit/)</generator>
+    <ttl>1440</ttl>
+    <image>
+      <url>http://cvra.net/templates/pjo_joomlaforall/images/logo.png</url>
+      <title>CVRA Race Circuit</title>
+      <link>http://points.joesdiner.org/</link>
+    </image>
+    <TMPL_LOOP results>
+    <item>
+      <title>[CVRA Circuit] <TMPL_VAR name> <TMPL_VAR type> at <TMPL_VAR eventName></title>
+      <link>http://points.joesdiner.org/personDetails.pl?person=<TMPL_VAR personId></link>
+      <description><TMPL_VAR name> (<TMPL_VAR gender>, <TMPL_VAR ageGroup>) <TMPL_VAR type> at <TMPL_VAR eventName><TMPL_IF raceName> <TMPL_VAR raceName></TMPL_IF> - <TMPL_VAR distance></description>
+      <guid isPermaLink="false"><TMPL_VAR guid></guid>
+      <pubDate><TMPL_VAR pubDate></pubDate>
+    </item>
+    </TMPL_LOOP>
+  </channel>
+</rss>
