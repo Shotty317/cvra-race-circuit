@@ -281,24 +281,28 @@ sub makeInputForm
   my $error = shift;
   my $formValuesRef = shift;
   
+  my ($activeCircuitId, $ageGroupsId);
+
   #create our html template
   my $template = HTML::Template->new(filename  => 'submit.tmpl', @consts::TMPL_OPT);
 
   # Verify there is an active circuit
-  my $sth = $dbh->prepare("SELECT id FROM circuit WHERE active=1");
+  my $sth = $dbh->prepare("SELECT id, age_groups_id FROM circuit WHERE active=1");
   $sth->execute();
 
-  if (!(my @data = $sth->fetchrow_array())) {
+  if (my @data = $sth->fetchrow_array()) {
+    $activeCircuitId = shift @data;
+    $ageGroupsId = shift @data;
+  }
+  else
+  {
     $template->param(noCircuit=>1);
   }
 
-  
-
-  
   # Age group list
-  $sth = $dbh->prepare("SELECT id, text FROM age_group ORDER by text");
+  $sth = $dbh->prepare("SELECT id, text FROM age_group WHERE age_groups_id = ? ORDER by text");
   
-  $sth->execute();
+  $sth->execute($ageGroupsId);
   
   my @ageGroups;
   while(my @data = $sth->fetchrow_array()) {
@@ -315,9 +319,9 @@ sub makeInputForm
   $sth->finish;
   
   # Returning User list
-  $sth = $dbh->prepare("SELECT people.id, name, age_group.text, circuit_id FROM people INNER JOIN(age_group) ON people.age_group = age_group.id WHERE circuit_id=(SELECT circuit_id FROM circuit WHERE active=1) ORDER BY name");
+  $sth = $dbh->prepare("SELECT people.id, name, age_group.text FROM people INNER JOIN(age_group) ON people.age_group = age_group.id WHERE circuit_id=? ORDER BY name");
   
-  $sth->execute();
+  $sth->execute($activeCircuitId);
   
   my %cookies = fetch CGI::Cookie();
   my @people;
@@ -327,7 +331,6 @@ sub makeInputForm
     $person{id} = shift @data;
     $person{name} = shift @data;
     $person{ageGroup} = shift @data;
-	my $circuitId = shift @data;
 
     #first check for form error selected person
     if (   defined $formValuesRef->{returningUserList}
@@ -339,7 +342,7 @@ sub makeInputForm
     # Then check if they are set in the cookie
     if ((!defined $cookies{rememberMe} || $cookies{rememberMe}->value eq 'true')
         && defined $cookies{circuitId}
-        && $circuitId eq $cookies{circuitId}->value
+        && $activeCircuitId eq $cookies{circuitId}->value
         && defined $cookies{personId}
         && $person{id} eq $cookies{personId}->value)
     {
@@ -350,15 +353,16 @@ sub makeInputForm
   $sth->finish;
   
   # Races list
-  $sth = $dbh->prepare("SELECT id, name, date, distance, cvra_event FROM races WHERE circuit_id=(SELECT circuit_id FROM circuit WHERE active=1) ORDER BY races.order");
+  $sth = $dbh->prepare("SELECT races.id, races.name, events.name, date_year, date_month, date_day, distance, cvra_event FROM races INNER JOIN(events) ON events.id = races.event_id WHERE events.circuit_id=? ORDER BY date_year, date_month, date_day, events.id");
   
-  $sth->execute();
+  $sth->execute($activeCircuitId);
   
   my @races;
   while(my @data = $sth->fetchrow_array()) {
     my %race = (id => shift @data,
-                name => shift @data,
-                date => shift @data,
+                raceName => shift @data,
+                eventName => shift @data,
+                date => &error::makeDate(shift @data, shift @data, shift @data),
                 distance => shift @data,
                 cvra => shift @data);
     if (   defined $formValuesRef->{raceId}
@@ -372,15 +376,16 @@ sub makeInputForm
   
   $dbh->disconnect();
   
-    if (defined $cookies{circuitId} && (!defined $cookies{rememberMe} || $cookies{rememberMe}->value eq 'true'))
-    {
-      $template->param(returningUser => 1);
-      $template->param(rememberMe => 1);
-    }
-  
-  if (!defined $cookies{rememberMe})
+  if (   defined $cookies{circuitId} 
+      && $cookies{circuitId}->value eq $activeCircuitId
+      && (!defined $cookies{rememberMe} || $cookies{rememberMe}->value eq 'true'))
   {
-    # TODO: if (SELECT circuit_id FROM circuit WHERE active=1) != $cookies{circuitId}->Value then also display first time
+    $template->param(returningUser => 1);
+    $template->param(rememberMe => 1);
+  }
+  
+  if (!defined $cookies{rememberMe} || $cookies{circuitId}->value ne $activeCircuitId)
+  {
     $template->param(firstTimeUser => 1);
     # TODO: this will display wrong if it's a first time user who unclicks remember me and then submitts an error page
     # Not handling this corner case right now as it is unlikely to happen or be a big problem if it does

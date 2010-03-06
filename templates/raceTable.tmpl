@@ -2,7 +2,7 @@
   <thead>
     <tr>
       <th rowspan="2">Date</th>
-      <th rowspan="2">Race</th>
+      <th rowspan="2" colspan="2">Race</th>
       <th rowspan="2">Distance</th>
       <th colspan="2">Points</th>
     </tr>
@@ -12,19 +12,30 @@
     </tr>
   </thead>
   <tbody>
-    <TMPL_IF races>
-    <TMPL_LOOP races>
-    <tr<TMPL_IF cvra> style="font-weight:bold; background-color: yellow;"</TMPL_IF>>
-      <td><TMPL_IF date><TMPL_VAR date><TMPL_ELSE><abbr title="To be determined">TBD</abbr></TMPL_IF></td>
-      <td><TMPL_IF url><a href="<TMPL_VAR url>"></TMPL_IF><TMPL_VAR name><TMPL_IF url></a></TMPL_IF></td>
+    <TMPL_IF events>
+    <TMPL_LOOP events>
+    <TMPL_LOOP event>
+      <tr<TMPL_IF cvra> style="font-weight:bold; background-color: yellow;"</TMPL_IF>>
+      <TMPL_IF __first__>
+        <td<TMPL_IF size> rowspan="<TMPL_VAR size>"</TMPL_IF>>
+          <TMPL_IF date><TMPL_VAR date><TMPL_ELSE><abbr title="To be determined">TBD</abbr></TMPL_IF>
+        </td>
+        <td<TMPL_IF size> rowspan="<TMPL_VAR size>"</TMPL_IF><TMPL_UNLESS raceName> colspan="2"</TMPL_UNLESS>>
+          <TMPL_IF url><a href="<TMPL_VAR url>"></TMPL_IF><TMPL_VAR eventName><TMPL_IF url></a></TMPL_IF>
+        </td>
+      </TMPL_IF>
+      <TMPL_IF raceName>
+        <td><TMPL_VAR raceName></td>
+      </TMPL_IF>
       <td><TMPL_VAR distance></td>
       <td align="right"><TMPL_IF racePoints><TMPL_VAR racePoints><TMPL_ELSE>&nbsp;</TMPL_IF></td>
       <td align="right"><TMPL_IF volunteerPoints><TMPL_VAR volunteerPoints><TMPL_ELSE>&nbsp;</TMPL_IF></td>
     </tr>
     </TMPL_LOOP>
-    <TMPL_ELSE>
+    </TMPL_LOOP>
+<TMPL_ELSE>
     <tr>
-      <td colspan="5">No Races!</td>
+      <td colspan="6">No Races!</td>
     </tr>
     </TMPL_IF>
   </tbody>

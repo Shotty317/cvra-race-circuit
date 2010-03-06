@@ -105,7 +105,6 @@ sub makeStandings {
     # No active circuit, jut browse the old ones
     &browseStandings();
     return;
-#    die "No active circuit found or invalid circuit ID ($circuitId). This is an error that should be fixed soon";
   }
   $sth->finish();
   
