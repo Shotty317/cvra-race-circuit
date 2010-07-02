@@ -45,7 +45,7 @@
           {
             invalidString += "  -Gender\n";
           }
-          if (form.ageGroup.value == "--")
+          if (form.ageGroup.value == "undefined")
           {
             invalidString += "  -Age Group\n";
           }
@@ -77,8 +77,14 @@
       
       function enableUserType(firstTimeUser)
       {
-        var index = firstTimeUser ? 0 : 1;
-        document.circuitInfo.returningUser[index].checked = true;
+        if (firstTimeUser)
+        {
+          document.circuitInfo.returningUser.firstTimeUser.checked = true;
+        }
+        else
+        {
+          document.circuitInfo.returningUser.returningUser.checked = true;
+        }
 
         // First time user
         document.circuitInfo.firstName.disabled = !firstTimeUser;
@@ -184,7 +190,7 @@
                   <td valign="top"><label for="ageGroup" id="ageGroupLabel">Age Group:</label></td>
                   <td>
                     <select name="ageGroup" id="ageGroup" onClick="enableUserType(true);">
-                      <option>--</option>
+                      <option value="undefined">--</option>
                       <TMPL_LOOP ageGroups>
                       <option value="<TMPL_VAR id>"<TMPL_IF selected> selected="selected"</TMPL_IF>><TMPL_VAR text></option>
                       </TMPL_LOOP>
