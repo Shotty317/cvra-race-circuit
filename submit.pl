@@ -92,7 +92,7 @@ sub handleFormSubmit
     {
 	    push(@error, {str=>"Please select either 'Returning User' or 'First Time User' when selecting or entering your name."});
     }
-    elsif ($returningUser eq 'false')
+    elsif ($returningUser eq "firstTimeUser")
     {
 	    my $firstName = $query->param('firstName') || '';
 	    my $lastName = $query->param('lastName') || '';
@@ -144,7 +144,7 @@ sub handleFormSubmit
         }
 	    }
     }
-    elsif ($returningUser eq 'true')
+    elsif ($returningUser eq "returningUser")
     {
 	    my $userId = $query->param('returningUserList') || '';
       

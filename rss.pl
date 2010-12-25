@@ -66,9 +66,35 @@ if (my @data = $sth->fetchrow_array())
                     guid => "http://cvra.net/circuit/results/" . shift @data,
                     pubDate => (shift @data) . " CDT"});
   }
+
+  $sth->finish;
+
+  my $query = new CGI;
+  
+  #connect to the database
+  my $dbh = DBI->connect(@consts::DB_OPT);
+  
+  if (defined $query->param('spam')) {
+    $sth = $dbh->prepare("SELECT id, DATE_FORMAT(timestamp,'%a, %d %b %Y %T'), ipaddress, user_id, name, cookie, zipcode FROM spam ORDER BY timestamp DESC LIMIT 50");
+    $sth->execute();
+    while(my @data = $sth->fetchrow_array()) {
+      push(@results, {guid => "http://cvra.net/circuit/results/spam/" . shift @data,
+                      pubDate => (shift @data) . " CDT",
+                      spam => 
+                          "IP: " . (shift @data) . "<br />" . 
+                          "User Id: " . (shift @data) . "<br />" .
+                          "Name: " . (shift @data) . "<br />" .
+                          "cookie: " . (shift @data) . "<br />" .
+                          "Zipcode: " . (shift @data) . "<br />"});
+    }
+
+    $sth->finish;
+  }
+
+
 }
 
-$sth->finish;
+
 $dbh->disconnect();
 
 $template->param(results => \@results);
