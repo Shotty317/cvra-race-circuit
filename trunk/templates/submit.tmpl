@@ -20,43 +20,51 @@
         
       function validateForm(form)
       {
-        if (form.returningUser[1].checked) // returning user
-        {
-          // Make sure a person is selected from the list for a returning user
-          if (fieldEmpty(form.returningUserList.value, "Please select a name from the list for a returning user"))
-          {
-            return false;
-          }
-        }
-        else if (form.returningUser[0].checked) // new user
-        {
-          var invalidString = "";
+        var radioChecked = false;
+        for (i=0;i<document.circuitInfo.returningUser.length;i++) {
+          if (document.circuitInfo.returningUser[i].checked) {
+            radioChecked = true;
+            if (document.circuitInfo.returningUser[i].value == "returningUser") {
+              // Make sure a person is selected from the list for a returning user
+              if (fieldEmpty(form.returningUserList.value, "Please select a name from the list for a returning user"))
+              {
+                return false;
+              }
+            }
+            else if (document.circuitInfo.returningUser[i].value == "firstTimeUser") {
+              var invalidString = "";
           
-          // make sure all the fields are filled out for a new user
-          if (fieldEmpty(form.firstName.value, ""))
-          {
-            invalidString += "  -First Name\n";
-          }
-          if (fieldEmpty(form.lastName.value, ""))
-          {
-            invalidString += "  -Last Name\n";
-          }
-          if (!form.gender[0].checked && !form.gender[1].checked)
-          {
-            invalidString += "  -Gender\n";
-          }
-          if (form.ageGroup.value == "undefined")
-          {
-            invalidString += "  -Age Group\n";
-          }
-
-          if (invalidString != "")
-          {
-            alert("Please fill in the following fields for a new person:\n" + invalidString);
-            return false;
+              // make sure all the fields are filled out for a new user
+              if (fieldEmpty(form.firstName.value, ""))
+              {
+                invalidString += "  -First Name\n";
+              }
+              if (fieldEmpty(form.lastName.value, ""))
+              {
+                invalidString += "  -Last Name\n";
+              }
+              if (!form.gender[0].checked && !form.gender[1].checked)
+              {
+                invalidString += "  -Gender\n";
+              }
+              if (form.ageGroup.value == "undefined")
+              {
+                invalidString += "  -Age Group\n";
+              }
+    
+              if (invalidString != "")
+              {
+                alert("Please fill in the following fields for a new person:\n" + invalidString);
+                return false;
+              }
+            }
+            else {
+              alert("fail2:" + document.circuitInfo.returningUser[i].value);
+              return false;
+            }
           }
         }
-        else
+        if (!radioChecked)
         {
           alert("Select either New User or Returning User");
           return false;
@@ -77,13 +85,16 @@
       
       function enableUserType(firstTimeUser)
       {
-        if (firstTimeUser)
-        {
-          document.circuitInfo.returningUser.firstTimeUser.checked = true;
-        }
-        else
-        {
-          document.circuitInfo.returningUser.returningUser.checked = true;
+        for (i=0;i<document.circuitInfo.returningUser.length;i++) {
+          if (document.circuitInfo.returningUser[i].value == "firstTimeUser") {
+            document.circuitInfo.returningUser[i].checked = firstTimeUser;
+          }
+          else if (document.circuitInfo.returningUser[i].value == "returningUser") {
+            document.circuitInfo.returningUser[i].checked = !firstTimeUser;
+          }
+          else {
+            alert("fail!"); 
+          }
         }
 
         // First time user
@@ -126,7 +137,7 @@
     <br>
     <center>
       <div style="background-color: red; text-color: white; border: medium double black; width: 75%; padding: 5px;">
-      The following information is incorrect or missing from when you submitted your race information. Please correct it and try again. If you are unable to resolve this error, please contact <a href="http://cvra.net/contact-us/34-board/12-joey-richey">CVRA Race Circuit Support</a> for help.
+      The following information is incorrect or missing from when you submitted your race information. Please correct it and try again. If you are unable to resolve this error, please contact <a href="http://cvra.net/contact-us/74-board/10-joey-richey">CVRA Race Circuit Support</a> for help.
       <blockquote>
       <ul style="text-align: left;">
       <TMPL_LOOP error>
@@ -141,7 +152,7 @@
     <form name="circuitInfo" action="submit.pl" onsubmit="return validateForm(this);" method="POST">
       <fieldset>
         <legend>Name</legend>
-        <p>If this is the first race you are submitting for the year, please select 'First Time User' and enter your information on the left before selecting the race in which you participated. If you have previously submitted a race this year, please select 'Returning User' on the right and select your name from the list. In the event that you submit incorrect information for a race and need it changed, pleaes contact <a href="http://cvra.net/contact-us/34-board/12-joey-richey">CVRA Race Circuit Support</a> with the details of what needs to be modified.</p>
+        <p>If this is the first race you are submitting for the year, please select 'First Time User' and enter your information on the left before selecting the race in which you participated. If you have previously submitted a race this year, please select 'Returning User' on the right and select your name from the list. In the event that you submit incorrect information for a race and need it changed, pleaes contact <a href="http://cvra.net/contact-us/74-board/10-joey-richey">CVRA Race Circuit Support</a> with the details of what needs to be modified.</p>
         <center>
         <TMPL_IF returningUser>
               <div style="background-color: yellow; border: medium double black; padding: 5px;">
@@ -163,7 +174,7 @@
         <table border="1" cellspacing="2" cellpadding="2" width="100%">
           <tr valign="top">
             <td width="50%">
-              <input type="radio" name="returningUser" value="false" id="firstTimeUser" onClick="enableUserType(true);"<TMPL_IF firstTimeUserChecked> checked="checked"</TMPL_IF>>
+              <input type="radio" name="returningUser" value="firstTimeUser" id="firstTimeUser" onClick="enableUserType(true);"<TMPL_IF firstTimeUserChecked> checked="checked"</TMPL_IF>>
               <label for="firstTimeUser" title="Please select this option if this race if the first one you are submitting for the current year">First Time User</label>
               
               <hr>
@@ -202,7 +213,7 @@
               </table>
             </td>
             <td width="50%">
-              <input type="radio" name="returningUser" value="true" id="returningUser" onClick="enableUserType(false);" <TMPL_IF returningUserChecked>checked="checked"</TMPL_IF>>
+              <input type="radio" name="returningUser" value="returningUser" id="returningUser" onClick="enableUserType(false);" <TMPL_IF returningUserChecked>checked="checked"</TMPL_IF>>
               <label for="returningUser" title="Please select this option if you have already submitted at least one race for the current year">Returning User</label>
               <hr>
               <select name="returningUserList" size="10" onClick="enableUserType(false);">

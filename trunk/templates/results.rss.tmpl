@@ -19,9 +19,14 @@
     </image>
     <TMPL_LOOP results>
     <item>
+      <TMPL_IF spam>
+      <title>[CVRA Circuit] [SPAM]</title>
+      <description><TMPL_VAR spam></description>
+      <TMPL_ELSE>
       <title>[CVRA Circuit] <TMPL_VAR name> <TMPL_VAR type> at <TMPL_VAR eventName></title>
       <link>http://points.joesdiner.org/personDetails.pl?person=<TMPL_VAR personId></link>
       <description><TMPL_VAR name> (<TMPL_VAR gender>, <TMPL_VAR ageGroup>) <TMPL_VAR type> at <TMPL_VAR eventName><TMPL_IF raceName> <TMPL_VAR raceName></TMPL_IF> - <TMPL_VAR distance></description>
+      </TMPL_IF>
       <guid isPermaLink="false"><TMPL_VAR guid></guid>
       <pubDate><TMPL_VAR pubDate></pubDate>
     </item>
