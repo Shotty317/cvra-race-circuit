@@ -34,7 +34,7 @@ eval {
   #create our html template
   my $template = HTML::Template->new(filename  => 'racelist.tmpl', @consts::TMPL_OPT);
   
-  my $sth = $dbh->prepare("SELECT races.name, events.name, events.id, events.url, date_year, date_month, date_day, volunteer_points, run_points, distance, events.cvra_event, circuit.year FROM races INNER JOIN(circuit) ON races.circuit_id = circuit.id INNER JOIN(events) ON races.event_id = events.id WHERE circuit.active=1 ORDER by date_year, date_month, date_day, events.id");
+  my $sth = $dbh->prepare("SELECT races.name, events.name, events.id, events.url, date_year, date_month, date_day, volunteer_points, run_points, distance, events.cvra_event, circuit.year FROM races INNER JOIN(circuit) ON races.circuit_id = circuit.id INNER JOIN(events) ON races.event_id = events.id WHERE circuit.active=1 ORDER by date_year, date_month, date_day, races.id");
   
   $sth->execute();
 
@@ -57,40 +57,39 @@ eval {
 
   if (scalar @races eq 0) {
     $template->param(noCircuit => 1);
-  }
-
-  my @events;
-  my @event;
-  my $lastEventId = undef;
-  for (my $i=0; $i < scalar @races; $i++) {
-    if (defined $lastEventId and ($races[$i]{'eventId'} ne $lastEventId)) {
-      # Make a copy of the array so our reference doesn't end up pointing to the next event
-      my @event2 = @event;
-      push(@events, { event => \@event2,
-                      size => scalar @event gt 1 ? scalar @event : undef,
-                      eventName => $races[$i-1]{'eventName'},
-                      url => $races[$i-1]{'url'},
-                      date => $races[$i-1]{'date'},
-                      cvra => $races[$i-1]{'cvra'}});
-      @event = ();
+  } else {
+    my @events;
+    my @event;
+    my $lastEventId = undef;
+    for (my $i=0; $i < scalar @races; $i++) {
+      if (defined $lastEventId and ($races[$i]{'eventId'} ne $lastEventId)) {
+        # Make a copy of the array so our reference doesn't end up pointing to the next event
+        my @event2 = @event;
+        push(@events, { event => \@event2,
+                        size => scalar @event gt 1 ? scalar @event : undef,
+                        eventName => $races[$i-1]{'eventName'},
+                        url => $races[$i-1]{'url'},
+                        date => $races[$i-1]{'date'},
+                        cvra => $races[$i-1]{'cvra'}});
+        @event = ();
+      }
+      push(@event, {raceName => $races[$i]{'raceName'},
+                    volunteerPoints => $races[$i]{'volunteerPoints'},
+                    racePoints => $races[$i]{'racePoints'},
+                    distance => $races[$i]{'distance'}});
+      $lastEventId = $races[$i]{'eventId'};
     }
-    push(@event, {raceName => $races[$i]{'raceName'},
-                  volunteerPoints => $races[$i]{'volunteerPoints'},
-                  racePoints => $races[$i]{'racePoints'},
-                  distance => $races[$i]{'distance'}});
-    $lastEventId = $races[$i]{'eventId'};
+    
+    push(@events, { event => \@event,
+                    size => scalar @event,
+                    eventName => $races[scalar @races - 1]{'eventName'},
+                    url => $races[scalar @races - 1]{'url'},
+                    date => $races[scalar @races - 1]{'date'},
+                    cvra => $races[scalar @races - 1]{'cvra'}});
+    
+    $template->param(events => \@events,
+                     year => $year);
   }
-
-  push(@events, { event => \@event,
-                  size => scalar @event,
-                  eventName => $races[scalar @races - 1]{'eventName'},
-                  url => $races[scalar @races - 1]{'url'},
-                  date => $races[scalar @races - 1]{'date'},
-                  cvra => $races[scalar @races - 1]{'cvra'}});
-
-  $template->param(events => \@events,
-                   year => $year);
-  
   print header(-"Cache-Control"=>"no-cache",
                -expires =>  '+0s');
   $template->output(print_to => *STDOUT);
