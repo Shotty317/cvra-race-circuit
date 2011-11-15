@@ -78,14 +78,22 @@ if (my @data = $sth->fetchrow_array())
     $sth = $dbh->prepare("SELECT id, DATE_FORMAT(timestamp,'%a, %d %b %Y %T'), ipaddress, user_id, name, cookie, zipcode FROM spam ORDER BY timestamp DESC LIMIT 50");
     $sth->execute();
     while(my @data = $sth->fetchrow_array()) {
-      push(@results, {guid => "http://cvra.net/circuit/results/spam/" . shift @data,
-                      pubDate => (shift @data) . " CDT",
-                      spam => 
-                          "IP: " . (shift @data) . "<br />" . 
-                          "User Id: " . (shift @data) . "<br />" .
-                          "Name: " . (shift @data) . "<br />" .
-                          "cookie: " . (shift @data) . "<br />" .
-                          "Zipcode: " . (shift @data) . "<br />"});
+      my $guid = "http://cvra.net/circuit/results/spam/" . shift @data;
+      my $pubDate = (shift @data) . " CDT";
+      my $spamHtml;
+      my $ipStr = shift @data;
+      $spamHtml .= "IP: " . $ipStr . "<br />" if (defined $ipStr);
+      my $userStr = shift @data;
+      $spamHtml .= "User Id: " . $userStr . "<br />" if (defined $userStr);
+      my $nameStr = shift @data;
+      $spamHtml .= "Name: " . $nameStr . "<br />" if (defined $nameStr);
+      my $cookieStr = shift @data;
+      $spamHtml .= "cookie: " . $cookieStr . "<br />" if (defined $cookieStr);
+      my $zipStr = shift @data;
+      $spamHtml .= "zip: " . $zipStr . "<br />" if (defined $zipStr);
+      push(@results, {guid => $guid,
+                      pubDate => $pubDate,
+                      spam => $spamHtml});
     }
 
     $sth->finish;

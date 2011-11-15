@@ -340,7 +340,7 @@ sub makeInputForm
     }
     
     # Then check if they are set in the cookie
-    if ((!defined $cookies{rememberMe} || $cookies{rememberMe}->value eq 'true')
+    if ((defined $cookies{rememberMe} && $cookies{rememberMe}->value eq 'true')
         && defined $cookies{circuitId}
         && $activeCircuitId eq $cookies{circuitId}->value
         && defined $cookies{personId}
@@ -378,7 +378,7 @@ sub makeInputForm
   
   if (   defined $cookies{circuitId} 
       && $cookies{circuitId}->value eq $activeCircuitId
-      && (!defined $cookies{rememberMe} || $cookies{rememberMe}->value eq 'true'))
+      && (defined $cookies{rememberMe} && $cookies{rememberMe}->value eq 'true'))
   {
     $template->param(returningUser => 1);
     $template->param(rememberMe => 1);
