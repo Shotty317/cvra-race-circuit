@@ -52,7 +52,7 @@ sub browseStandings()
   #create our html template
   my $template = HTML::Template->new(filename  => 'browse-standings.tmpl', @consts::TMPL_OPT);
   
-  my $sth = $dbh->prepare("SELECT id, year, active FROM circuit WHERE visible=1 ORDER BY year");
+  my $sth = $dbh->prepare("SELECT id, year, active FROM circuit WHERE visible=1 ORDER BY year DESC");
   
   $sth->execute();
   
