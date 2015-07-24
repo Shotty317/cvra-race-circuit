@@ -1,0 +1,1 @@
+A little web app to keep track of the CVRA race circuit points. This project is not meant to be a full fledged, generic point tracking system, but a specific implementation for one club. It could be relatively easily adapted for other clubs/uses, but that is not directly supported out of the box. See http://cvra.net for details
