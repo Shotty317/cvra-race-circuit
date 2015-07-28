@@ -160,7 +160,7 @@ sub handleFormSubmit
     }
     else
     {
-      push (@error, {str=>"Invalid type of new/returning user. Either you are trying to do something funny or this is a bug in the CVRA Race Circuit system"});
+      push (@error, {str=>"Invalid type of new/returning user. Either you are trying to do something funny or this is a bug in the Corridor Running Race Circuit system"});
     }
     
     my $raceId = $query->param('raceList') || '';
