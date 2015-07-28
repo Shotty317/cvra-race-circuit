@@ -232,7 +232,7 @@
         <br>
         <select name="raceList" id="raceList" size="15" style="min-width:100px;">
         <TMPL_LOOP races>
-          <option value="<TMPL_VAR id>"<TMPL_IF selected> selected="selected"</TMPL_IF>><TMPL_VAR eventName><TMPL_IF raceName> - <TMPL_VAR raceName></TMPL_IF><TMPL_IF date> (<TMPL_VAR date>)</TMPL_IF> - <TMPL_VAR distance><TMPL_IF cvra> *</TMPL_IF></option>
+          <option value="<TMPL_VAR id>"<TMPL_IF selected> selected="selected"</TMPL_IF>><TMPL_VAR eventName><TMPL_IF date> (<TMPL_VAR date>)</TMPL_IF> - <TMPL_VAR distance><TMPL_IF raceName> - <TMPL_VAR raceName></TMPL_IF><TMPL_IF cvra> *</TMPL_IF></option>
         </TMPL_LOOP>
         </select>
         <p>* CVRA event</p>
